@@ -1,12 +1,17 @@
 // Importing Supertest for making http requests
 const request = require('supertest');
 
-const { app, db } = require('./app');
+const { app, db, initializeDatabase } = require('./app');
 
 // To clean the test database after the testing
 const fs = require('fs');
 
 const testDbFile = './ecomstore.test.db';
+
+// This runs ONCE before all tests to wait for the DB seeding operation
+beforeAll(async () => {
+  await initializeDatabase();
+})
 
 // When all tests are finished
 afterAll((done) => {
@@ -36,10 +41,11 @@ describe('Products API', () => {
       .expect('Content-Type', /json/); // Expecting a JSON response
     
     expect(res.body).toBeInstanceOf(Array);
-    
-    // Checking our mock data is in response or not
     expect(res.body.length).toBe(5);
-    expect(res.body[0].name).toBe('Vintage T-Shirt');
+    
+    // Checking our Fake Store API data is in response or not
+    expect(res.body[0].name).toBe('Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops');
+    expect(res.body[0].price).toBe(10995);
   })
 });
 
@@ -69,9 +75,9 @@ describe('Cart API tests', () => {
     expect(res.body).toHaveProperty('total');
     
     // Checking the calculations
-    expect(res.body.items[0].name).toBe('Vintage T-Shirt');
+    expect(res.body.items[0].name).toBe('Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops');
     expect(res.body.items[0].quantity).toBe(2);
-    expect(res.body.total).toBe(442000);
+    expect(res.body.total).toBe(21990); // Total = 2 * 10995
   });
   
   // Deleting an item from the cart
@@ -107,7 +113,7 @@ describe('Cart API tests', () => {
       .send()
       .expect(200);
     
-    expect(res.body.total).toBe(1275000);
+    expect(res.body.total).toBe(2230);
     expect(res.body).toHaveProperty('timestamp');
     
     // Checking if the cart is being emptied after generating receipt
