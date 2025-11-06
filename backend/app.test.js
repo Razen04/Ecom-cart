@@ -42,3 +42,35 @@ describe('Products API', () => {
     expect(res.body[0].name).toBe('Vintage T-Shirt');
   })
 });
+
+// Testing the /api/cart API Endpoint
+describe('Cart API tests', () => {
+  
+  // Adding item to the Cart
+  it('should POST an item to /api/cart', async () => {
+    
+    const res = await request(app)
+      .post('/api/cart')
+      .send({ productId: 1, quantity: 2 }) // A test payload
+      .expect(201);
+    
+    expect(res.body.message).toBe('Item added to the cart');
+    expect(res.body.id).toBeDefined(); // Checking if it is returing an id.
+  });
+  
+  // Getting all the items present in the cart
+  it('should GET all the items present in the /api/cart', async () => {
+    
+    const res = await request(app)
+      .get('/api/cart')
+      .expect(200);
+    
+    expect(res.body).toHaveProperty('items');
+    expect(res.body).toHaveProperty('total');
+    
+    // Checking the calculations
+    expect(res.body.items[0].name).toBe('Vintage T-Shirt');
+    expect(res.body.items[0].quantity).toBe(2);
+    expect(res.body.total).toBe(442000);
+  })
+})
