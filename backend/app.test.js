@@ -72,5 +72,46 @@ describe('Cart API tests', () => {
     expect(res.body.items[0].name).toBe('Vintage T-Shirt');
     expect(res.body.items[0].quantity).toBe(2);
     expect(res.body.total).toBe(442000);
+  });
+  
+  // Deleting an item from the cart
+  it('should DELETE an item from the cart', async () => {
+    
+    const res = await request(app)
+      .delete('/api/cart/1')
+      .expect(200);
+    
+    expect(res.body.message).toBe('Item removed');
+  });
+  
+  // Should not allow checkout with an empty cart
+  it('should not allow checkout with an empty cart', async () => {
+    
+    const res = await request(app)
+      .post('/api/checkout')
+      .send()
+      .expect(400);
+    
+    expect(res.body.error).toBe('Cart is empty');
   })
-})
+  
+  // Checking the POST for checkout and checking if we are receiving the mock receipt
+  it('should POST to checkout with items in cart, return mock receipt', async () => {
+    
+    // Adding noise-cancelling headphones
+    await request(app)
+      .post('/api/cart').send({ productId: 2, quantity: 1 });
+    
+    const res = await request(app)
+      .post('/api/checkout')
+      .send()
+      .expect(200);
+    
+    expect(res.body.total).toBe(1275000);
+    expect(res.body).toHaveProperty('timestamp');
+    
+    // Checking if the cart is being emptied after generating receipt
+    const cart = await request(app).get('/api/cart').expect(200);
+    expect(cart.body.items.length).toBe(0);
+  })
+});

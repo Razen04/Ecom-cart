@@ -111,13 +111,13 @@ app.get("/api/products", (req, res) => {
  * @desc    Add a prodcut to the cart
  * @body    {productId: 1, quantity: 1}
  */
-app.post('/api/cart', (req, res) => {
+app.post("/api/cart", (req, res) => {
   // getting the productId and quantity from the request
   const { productId, quantity } = req.body;
 
   if (!productId || !quantity || quantity <= 0) {
     return res.status(400).json({
-      message: "Invalid input: productId and a positve quantiy is required.",
+      error: "Invalid input: productId and a positve quantiy is required.",
     });
   }
 
@@ -127,7 +127,7 @@ app.post('/api/cart', (req, res) => {
   db.get(checkSql, [productId], (err, row) => {
     if (err) {
       console.error(err.message);
-      return res.status(500).json({ message: "Database error" });
+      return res.status(500).json({ error: "Database error" });
     }
 
     // If the item is already in the cart we just increase the quantity
@@ -178,24 +178,93 @@ app.get("/api/cart", (req, res) => {
       FROM cart c
       JOIN products p ON c.productId = p.id
   `;
-  
+
   db.all(sql, [], (err, rows) => {
+    if (err) {
+      console.error(err.message);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+
+    // Calculating the total price of the cart by accumulating price
+    const total = rows.reduce((acc, item) => {
+      return acc + item.price * item.quantity;
+    }, 0);
+
+    res.json({
+      items: rows,
+      total: total, // The total is in paisa and need to be converted in Rs in frontend
+    });
+  });
+});
+
+/**
+ * @route   DELETE /api/cart/:id
+ * @desc    Delete an item from the cart
+ * @params  id (the cart id and not the product id)
+ */
+app.delete("/api/cart/:id", (req, res) => {
+  const { id } = req.params;
+
+  const sql = "DELETE FROM cart WHERE id = ?";
+
+  db.run(sql, [id], function (err) {
+    if (err) {
+      console.error(err.message);
+      return res.status(500).json({ error: "Failed to remove items" });
+    }
+
+    // this.changes returns how many rows were affected
+    if (this.changes === 0) {
+      return res.status(404).json({ error: "Item not found in cart." });
+    }
+
+    res.status(200).json({ message: "Item removed" });
+  });
+});
+
+/**
+ * @route   POST /api/checkout
+ * @desc    Process the checkout
+ */
+app.post("/api/checkout", (req, res) => {
+  const getCartSql = `
+      SELECT p.price, c.quantity
+      FROM cart c
+      JOIN products p ON c.productId = p.id
+    `;
+  
+  db.all(getCartSql, [], (err, rows) => {
     if(err) {
       console.error(err.message);
-      return res.status(500).json({ error: 'Internal server error' });
+      return res.status(500).json({ error: 'Internal database error' });
     }
     
-    // Calculating the total price of the cart by accumulating price
+    if(rows.length === 0) {
+      return res.status(400).json({ error: 'Cart is empty' });
+    }
+    
+    // We get the total from the database
     const total = rows.reduce((acc, item) => {
       return acc + (item.price * item.quantity);
     }, 0);
     
-    res.json({
-      items: rows,
-      total: total // The total is in paisa and need to be converted in Rs in frontend
+    // Creating a mock receipt
+    const receipt = {
+      total: total,
+      timestamp: new Date().toISOString()
+    };
+    
+    // Clearing the cart after receipt generation
+    const deleteCartSql = "DELETE FROM cart";
+    
+    db.run(deleteCartSql, [], (err) => {
+      if(err) {
+        console.error(err.message);
+        return res.status(500).json({ error: 'Failed to clear cart after checkout.' });
+      }
+      
+      res.status(200).json(receipt);
     })
   })
 });
-
-
 module.exports = { app, db };
