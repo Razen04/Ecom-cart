@@ -91,7 +91,8 @@ router.get("/cart", (req, res) => {
         c.quantity,
         p.id AS productId,
         p.name,
-        p.price
+        p.price,
+        p.image
       FROM cart c
       JOIN products p ON c.productId = p.id
   `;
@@ -138,6 +139,67 @@ router.delete("/cart/:id", (req, res) => {
     res.status(200).json({ message: "Item removed" });
   });
 });
+
+/**
+ * @route   PATCH /api/cart/:id
+ * @desc    Increment or decrement the item quantity in the cart
+ * @params  id (the cart id, not the product id)
+ * @body    { change: number } — positive to increase, negative to decrease
+ */
+
+router.patch("/cart/update/:id", (req, res) => {
+  const { id } = req.params;
+  const { change } = req.body;
+
+  if (typeof change !== "number" || change === 0) {
+    return res.status(400).json({ error: "Invalid change value." });
+  }
+
+  // We will ensure the quantity never goes below 0
+  const getSql = "SELECT quantity FROM cart WHERE id = ?";
+
+  db.get(getSql, [id], (err, row) => {
+    if (err) {
+      console.error(err.message);
+      return res.status(500).json({ error: "Database error." });
+    }
+
+    if (!row) {
+      return res.status(404).json({ error: "Item not found in cart." });
+    }
+
+    const newQuantity = row.quantity + change;
+
+    // If quantity becomes zero or less we will remove the item
+    if (newQuantity <= 0) {
+      const deleteSql = "DELETE FROM cart WHERE id = ?";
+      db.run(deleteSql, [id], function (err) {
+        if (err) {
+          console.error(err.message);
+          return res.status(500).json({ error: "Failed to remove item." });
+        }
+        return res.status(200).json({ message: "Item removed from cart." });
+      });
+      return;
+    }
+
+    // Otherwise we will update the quantity
+    const updateSql = "UPDATE cart SET quantity = quantity + ? WHERE id = ?";
+    db.run(updateSql, [change, id], function (err) {
+      if (err) {
+        console.error(err.message);
+        return res.status(500).json({ error: "Failed to update quantity." });
+      }
+
+      if (this.changes === 0) {
+        return res.status(404).json({ error: "Item not found." });
+      }
+
+      res.status(200).json({ message: "Cart item updated successfully." });
+    });
+  });
+});
+
 
 /**
  * @route   POST /api/checkout
