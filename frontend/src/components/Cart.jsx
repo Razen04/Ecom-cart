@@ -21,7 +21,7 @@ const Cart = ({ details, setDetails }) => {
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-white rounded-3xl shadow-2xl w-2/3 max-w-4xl p-8 relative">
+      <div className="bg-white rounded-3xl shadow-2xl w-full mx-10 max-w-4xl p-8 relative">
         {/* Header */}
 
         <div className="flex justify-between items-center mb-6">

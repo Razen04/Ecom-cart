@@ -18,12 +18,12 @@ const ProductModal = () => {
   return (
     // Backdrop
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-xs"
       onClick={closeProductModal}
     >
       {/* Modal Panel */}
       <div
-        className="relative w-full max-w-3xl p-6 bg-white rounded-2xl shadow-2xl"
+        className="relative w-full mx-4 max-w-3xl max-h-[90vh] overflow-y-auto p-6 bg-white rounded-2xl shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -35,9 +35,9 @@ const ProductModal = () => {
         </button>
   
         {/* Modal Content */}
-        <div className="flex flex-col md:flex-row gap-6">
+        <div className="flex flex-col mt-6 md:flex-row gap-4 md:gap-6">
           {/* Image */}
-          <div className="md:w-1/2 h-64 p-4 bg-gray-300 rounded-xl flex items-center justify-center">
+          <div className="md:w-1/2 w-full h-64 md:h-auto p-4 bg-gray-300 rounded-xl flex items-center justify-center">
             <img
               src={selectedProduct.image}
               alt={selectedProduct.name}
@@ -48,19 +48,19 @@ const ProductModal = () => {
           {/* Details */}
           <div className="md:w-1/2 flex flex-col justify-between text-white">
             <div className="space-y-4">
-              <h2 className="text-2xl text-black font-bold">{selectedProduct.name}</h2>
+              <h2 className="text-xl md:text-2xl text-black font-bold">{selectedProduct.name}</h2>
               <p className="text-gray-500 text-sm md:text-base">
                 {selectedProduct.description}
               </p>
   
-              <span className="text-3xl font-bold text-cyan-400">
+              <span className="text-2xl md:text-3xl font-bold text-cyan-400">
                 {formatPrice(selectedProduct.price)}
               </span>
             </div>
   
             <button
               onClick={handleAddToCart}
-              className="mt-6 w-full px-4 py-3 bg-cyan-600 text-white font-semibold rounded-xl hover:bg-cyan-500 transition-colors shadow-md cursor-pointer"
+              className="mt-4 md:mt-6 w-full px-4 py-3 bg-cyan-600 text-white font-semibold rounded-xl hover:bg-cyan-500 transition-colors shadow-md cursor-pointer"
             >
               Add to Cart
             </button>
