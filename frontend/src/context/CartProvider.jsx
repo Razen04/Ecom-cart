@@ -10,7 +10,10 @@ export const CartProvider = ({ children }) => {
   const [cartTotal, setCartTotal] = useState(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [receipt, setReceipt] = useState(null);
+  
+  const [selectedProduct, setselectedProduct] = useState(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -119,6 +122,17 @@ export const CartProvider = ({ children }) => {
     setIsReceiptOpen(false);
     setReceipt(null);
   };
+  
+  // Product Modal functions
+  const openProductModal = (product) => {
+    setIsProductModalOpen(true);
+    setselectedProduct(product);
+  }
+  
+  const closeProductModal = (product) => {
+    setIsProductModalOpen(false);
+    setselectedProduct(product);
+  }
 
   const value = {
     products,
@@ -135,7 +149,11 @@ export const CartProvider = ({ children }) => {
     checkout,
     openCart,
     closeCart,
-    closeReceipt
+    closeReceipt,
+    selectedProduct,
+    isProductModalOpen,
+    openProductModal,
+    closeProductModal
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

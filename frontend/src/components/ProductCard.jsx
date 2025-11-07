@@ -4,7 +4,7 @@ import formatPrice from "../helper";
 import { Plus, Minus } from "lucide-react";
 
 const ProductCard = ({ product }) => {
-  const { updateQuantity, cartItems, addToCart } = useCart();
+  const { updateQuantity, cartItems, addToCart, openProductModal } = useCart();
 
   const cartItem = cartItems.find((item) => item.productId === product.id);
   const quantity = cartItem ? cartItem.quantity : 0;
@@ -13,9 +13,11 @@ const ProductCard = ({ product }) => {
   const handleDecrease = () => updateQuantity(cartItem.id, -1);
 
   return (
-      <div className="border border-gray-200 rounded-xl bg-white flex flex-col h-full transition hover:shadow-sm">
+      <div 
+        
+        className="border border-gray-200 rounded-xl bg-white flex flex-col h-full transition hover:shadow-sm cursor-pointer">
         {/* Product Image */}
-        <div className="w-full h-48 flex items-center justify-center p-4">
+        <div  onClick={() => openProductModal(product)} className="w-full h-48 flex items-center justify-center p-4">
           <img
             src={product.image}
             alt={product.name}
@@ -23,24 +25,28 @@ const ProductCard = ({ product }) => {
           />
         </div>
   
-        {/* Product Info */}
+        
         <div className="p-4 flex flex-col grow">
-          <h2
-            className="text-base font-medium text-gray-900 truncate"
-            title={product.name}
-          >
-            {product.name}
-          </h2>
-  
-          <p className="text-sm text-gray-500 mt-1 grow">
-            {product.description.substring(0, 80)}...
-          </p>
-  
-          <div className="flex justify-between items-center mt-3">
-            <span className="text-lg font-semibold text-gray-800">
-              {formatPrice(product.price)}
-            </span>
+          {/* Product Info */}
+          <div  onClick={() => openProductModal(product)}>
+            <h2
+              className="text-base font-medium text-gray-900 truncate"
+              title={product.name}
+            >
+              {product.name}
+            </h2>
+    
+            <p className="text-sm text-gray-500 mt-1 grow">
+              {product.description.substring(0, 80)}...
+            </p>
+    
+            <div className="flex justify-between items-center mt-3">
+              <span className="text-lg font-semibold text-gray-800">
+                {formatPrice(product.price)}
+              </span>
+            </div>
           </div>
+          
   
           {/* Quantity Controls */}
           {quantity > 0 ? (
@@ -64,7 +70,7 @@ const ProductCard = ({ product }) => {
           ) : (
             <button
               onClick={() => addToCart(product.id)}
-              className="mt-4 w-full px-3 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition"
+              className="mt-4 w-full px-3 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition cursor-pointer"
             >
               Add to Cart
             </button>

@@ -18,7 +18,7 @@ const Header = () => {
     
         <button
           onClick={openCart}
-          className="relative flex items-center gap-2 text-gray-700 hover:text-cyan-600 transition-colors"
+          className="relative flex items-center gap-2 text-gray-700 hover:text-cyan-600 transition-colors cursor-pointer"
         >
           {/* Cart Icon */}
           <ShoppingBag size={15} />

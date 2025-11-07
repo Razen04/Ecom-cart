@@ -59,7 +59,7 @@ const CartItem = ({ item }) => {
         
         <button
           onClick={() => removeFromCart(item.id)}
-          className="text-gray-400 hover:text-red-500 transition-colors"
+          className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
         >
           <Trash2 size={18} />
         </button>
