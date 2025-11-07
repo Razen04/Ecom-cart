@@ -71,6 +71,18 @@ export const CartProvider = ({ children }) => {
     },
     [fetchCart],
   );
+  
+  // Function to update the quantity
+  const updateQuantity = useCallback(async (cartItemId, change = 1) => {
+    try {
+      await axios.patch(`/api/cart/update/${cartItemId}`, { change });
+      
+      // we will update the cart
+      await fetchCart();
+    } catch (err) {
+      console.error("Failed to update quantity.", err);
+    }
+  }, [fetchCart])
 
   // Function to delete an item from the cart
   const removeFromCart = useCallback(
@@ -102,7 +114,7 @@ export const CartProvider = ({ children }) => {
 
   const openCart = () => setIsCartOpen(true);
   const closeCart = () => setIsCartOpen(false);
-
+  
   const closeReceipt = () => {
     setIsReceiptOpen(false);
     setReceipt(null);
@@ -118,11 +130,12 @@ export const CartProvider = ({ children }) => {
     loading,
     error,
     addToCart,
+    updateQuantity,
     removeFromCart,
     checkout,
     openCart,
     closeCart,
-    closeReceipt,
+    closeReceipt
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
