@@ -127,8 +127,7 @@ ecom-cart/
 
 To run this project locally, you'll need **Node.js (v18 or newer)** installed. You'll also need two separate terminal windows, as the frontend and backend run as separate processes.
 
-> You can checkout this [Youtube Demo](https://youtu.be/Imtlp4iQd3c)
-> You can checkout the database diagram [here](https://dbdiagram.io/d/EcomCart-690df4a36735e11170be3332)
+> You can checkout this [Youtube Demo](https://youtu.be/Imtlp4iQd3c) and can checkout the database diagram [here](https://dbdiagram.io/d/EcomCart-690df4a36735e11170be3332)
 
 ### 1. Clone the Repository
 
